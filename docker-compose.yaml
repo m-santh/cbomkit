@@ -18,12 +18,13 @@ services:
   backend:
     image: ghcr.io/ibm/cbomkit:${CBOMKIT_VERSION}
     environment:
+      JAVA_OPTS: "-Xmx32g -Xms32g -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200"
       CBOMKIT_DB_TYPE: postgresql
       CBOMKIT_DB_JDBC_URL: jdbc:postgresql://db:5432/postgres
       CBOMKIT_PORT: 8081
       CBOMKIT_DB_USERNAME: ${POSTGRESQL_AUTH_USERNAME}
       CBOMKIT_DB_PASSWORD: ${POSTGRESQL_AUTH_PASSWORD}
-      CBOMKIT_FRONTEND_URL_CORS: "http://localhost:8001"
+      CBOMKIT_FRONTEND_URL_CORS: "https://cbom2.avinyasq.com"
 #      CBOMKIT_REGULATOR_API_BASE: "http://regulator:8080"
 #      CBOMKIT_QS_EXPLORER_API_BASE: "http://localhost:8000/api/v1/scan"
     ports:
@@ -34,7 +35,8 @@ services:
     deploy:
       resources:
         reservations:
-          memory: 16g
+          cpus: '13'
+          memory: 40g
     profiles:
       - prod
       - ext-compliance
@@ -42,8 +44,8 @@ services:
   frontend:
     image: ghcr.io/ibm/cbomkit-frontend:${CBOMKIT_VERSION}
     environment:
-      VUE_APP_HTTP_API_BASE: "http://localhost:8081"
-      VUE_APP_WS_API_BASE: "ws://localhost:8081"
+      VUE_APP_HTTP_API_BASE: "https://cbom2.avinyasq.com/api"
+      VUE_APP_WS_API_BASE: "wss://cbom2.avinyasq.com/api"
       VUE_APP_TITLE: "CBOMkit"
       VUE_APP_VIEWER_ONLY: ${CBOMKIT_VIEWER}
     ports:
